@@ -16,6 +16,8 @@ class Settings(BaseSettings):
 
     # === Gemma 4 / Gemini API ===
     GEMMA_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+    GOOGLE_API_KEY: str = ""
     # Primary model: Gemma 4 Dense (31B). Fallback to MoE variant.
     GEMMA_MODEL: str = "gemma-4-31b-it"
     GEMMA_MODEL_FALLBACK: str = "gemma-4-26b-a4b-it"

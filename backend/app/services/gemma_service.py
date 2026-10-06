@@ -14,12 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 def _get_api_key() -> str:
-    """Retrieve GEMMA_API_KEY from environment or settings."""
-    key = os.environ.get("GEMMA_API_KEY", "").strip()
-    if not key:
-        settings = get_settings()
-        key = (settings.GEMMA_API_KEY or "").strip()
-    return key
+    """Retrieve GEMMA_API_KEY, GEMINI_API_KEY, or GOOGLE_API_KEY from environment or settings."""
+    for var_name in ["GEMMA_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"]:
+        key = os.environ.get(var_name, "").strip()
+        if key:
+            return key
+    settings = get_settings()
+    for attr in ["GEMMA_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"]:
+        key = (getattr(settings, attr, "") or "").strip()
+        if key:
+            return key
+    return ""
 
 
 def _get_client() -> genai.Client:
