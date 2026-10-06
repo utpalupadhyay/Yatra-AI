@@ -61,7 +61,7 @@ def generate_itinerary(
     Returns a dict with itinerary, budget_breakdown, and interaction_id.
     """
     client = _get_client()
-    interests_str = ", ".join(interests)
+    interests_str = ", ".join(interests) if interests else "No specific interests selected"
     lang_instruction = "Respond in Hindi." if language == "hindi" else "Respond in English."
 
     prompt = f"""
@@ -74,7 +74,7 @@ Create a complete {num_days}-day travel itinerary for the following trip:
 - 📅 Duration: {num_days} days
 - 💰 Total Budget: ₹{budget:,.0f} for {num_travelers} traveler(s) (₹{budget/num_travelers:,.0f} per person)
 - 👥 Travelers: {num_travelers}
-- 🎯 Interests: {interests_str}
+- 🎯 Travel interests: {interests_str}
 - 🏨 Accommodation: {accommodation.replace('_', ' ').title()}
 - 🍴 Food Preference: {food_preference.replace('_', ' ').title()}
 {f'- 📝 Special Requests: {special_requests}' if special_requests else ''}
@@ -233,7 +233,7 @@ def generate_packing_list(
     """Generate a personalized packing checklist using Gemma 4."""
     client = _get_client()
     lang_instruction = "Respond in Hindi." if language == "hindi" else "Respond in English."
-    interests_str = ", ".join(interests)
+    interests_str = ", ".join(interests) if interests else "General sightseeing"
     season_note = f"Current season: {season}" if season else ""
 
     prompt = f"""

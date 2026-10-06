@@ -32,7 +32,7 @@ class TripRequest(BaseModel):
     num_days: int = Field(..., ge=1, le=30, description="Number of travel days")
     budget: float = Field(..., ge=500, description="Total budget in INR")
     num_travelers: int = Field(..., ge=1, le=20, description="Number of travelers")
-    interests: list[str] = Field(..., min_length=1, description="Travel interests")
+    interests: list[str] = Field(default_factory=list, description="Travel interests")
     accommodation: AccommodationType = AccommodationType.mid_range
     food_preference: FoodPreference = FoodPreference.any
     language: Language = Language.english
@@ -58,7 +58,7 @@ class ChatRequest(BaseModel):
 class PackingRequest(BaseModel):
     destination: str
     num_days: int
-    interests: list[str]
+    interests: list[str] = Field(default_factory=list)
     season: Optional[str] = None
     language: Language = Language.english
 

@@ -7,11 +7,12 @@
 
 // ── App State ─────────────────────────────────────
 const state = {
-  currentTrip: null,      // raw itinerary text from Gemma 4
-  interactionId: null,    // Gemma 4 interaction ID
-  chatConversationId: null, // for multi-turn chat
-  formData: null,         // last submitted form data
+  currentTrip: null,          // raw itinerary text from Gemma 4
+  interactionId: null,        // Gemma 4 interaction ID
+  chatConversationId: null,   // for multi-turn chat
+  formData: null,             // last submitted form data
   language: "english",
+  selectedInterests: [],      // array of selected interest names
 };
 
 // ── DOM Ready ─────────────────────────────────────
@@ -75,11 +76,29 @@ function initNavbar() {
 }
 
 function initInterestChips() {
-  document.querySelectorAll(".interest-chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      chip.classList.toggle("selected");
+  const chips = document.querySelectorAll(".interest-chip");
+  chips.forEach((chip) => {
+    chip.addEventListener("click", (e) => {
+      e.preventDefault(); // Prevent form submission and page reload
+      const interest = chip.getAttribute("data-interest") || chip.textContent.trim();
+      toggleInterest(interest, chip);
     });
   });
+}
+
+function toggleInterest(interest, chipEl) {
+  const idx = state.selectedInterests.indexOf(interest);
+  if (idx > -1) {
+    // Already selected -> remove it
+    state.selectedInterests.splice(idx, 1);
+    chipEl.classList.remove("selected");
+    chipEl.setAttribute("aria-pressed", "false");
+  } else {
+    // Not selected -> add it
+    state.selectedInterests.push(interest);
+    chipEl.classList.add("selected");
+    chipEl.setAttribute("aria-pressed", "true");
+  }
 }
 
 function initBudgetCalculator() {
@@ -125,13 +144,12 @@ function setLanguage(lang) {
 const tripForm = document.getElementById("tripForm");
 
 function getFormData() {
-  const interests = [...document.querySelectorAll(".interest-chip.selected")]
-    .map((c) => c.querySelector("input").value);
-
-  if (interests.length === 0) {
-    alert("Please select at least one travel interest.");
-    return null;
-  }
+  // Read interests from state.selectedInterests (or fallback to DOM .selected chips)
+  const interests = state.selectedInterests && state.selectedInterests.length > 0
+    ? [...state.selectedInterests]
+    : [...document.querySelectorAll(".interest-chip.selected")].map(
+        (c) => c.getAttribute("data-interest") || c.textContent.trim()
+      );
 
   const data = {
     origin: document.getElementById("origin").value.trim(),
