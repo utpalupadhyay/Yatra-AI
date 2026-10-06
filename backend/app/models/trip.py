@@ -1,8 +1,8 @@
 """
 Yatra AI - Pydantic models for request/response validation.
 """
-from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Any
+from pydantic import BaseModel, Field, model_validator
 from enum import Enum
 
 
@@ -27,16 +27,59 @@ class Language(str, Enum):
 
 
 class TripRequest(BaseModel):
-    destination: str = Field(..., min_length=2, max_length=200, description="Travel destination")
-    origin: str = Field(..., min_length=2, max_length=200, description="Starting city")
-    num_days: int = Field(..., ge=1, le=30, description="Number of travel days")
+    destination: str = Field(..., description="Travel destination")
+    origin: Optional[str] = Field(None, description="Starting location")
+    num_days: Optional[int] = Field(None, description="Number of travel days")
     budget: float = Field(..., ge=500, description="Total budget in INR")
-    num_travelers: int = Field(..., ge=1, le=20, description="Number of travelers")
+    num_travelers: Optional[int] = Field(None, description="Number of travelers")
     interests: list[str] = Field(default_factory=list, description="Travel interests")
-    accommodation: AccommodationType = AccommodationType.mid_range
-    food_preference: FoodPreference = FoodPreference.any
-    language: Language = Language.english
-    special_requests: Optional[str] = Field(None, max_length=500)
+    accommodation: str = Field("mid_range", description="Accommodation preference")
+    food_preference: Optional[str] = Field("any", description="Food preference")
+    language: Optional[str] = Field("english", description="Response language")
+    special_requests: Optional[str] = Field(None, description="Special requests")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_fields(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # Normalize 'from' -> 'origin'
+            if "from" in data and not data.get("origin"):
+                data["origin"] = data["from"]
+            elif "from_loc" in data and not data.get("origin"):
+                data["origin"] = data["from_loc"]
+            # Normalize 'days' -> 'num_days'
+            if "days" in data and not data.get("num_days"):
+                data["num_days"] = data["days"]
+            # Normalize 'travelers' -> 'num_travelers'
+            if "travelers" in data and not data.get("num_travelers"):
+                data["num_travelers"] = data["travelers"]
+            # Normalize 'foodPreference' -> 'food_preference'
+            if "foodPreference" in data and not data.get("food_preference"):
+                data["food_preference"] = data["foodPreference"]
+            # Normalize 'specialRequests' -> 'special_requests'
+            if "specialRequests" in data and not data.get("special_requests"):
+                data["special_requests"] = data["specialRequests"]
+        return data
+
+    @property
+    def get_origin(self) -> str:
+        return self.origin or "Your City"
+
+    @property
+    def get_num_days(self) -> int:
+        return self.num_days or 3
+
+    @property
+    def get_num_travelers(self) -> int:
+        return self.num_travelers or 1
+
+    @property
+    def get_food_preference(self) -> str:
+        return self.food_preference or "any"
+
+    @property
+    def get_special_requests(self) -> Optional[str]:
+        return self.special_requests or None
 
 
 class ReplanRequest(BaseModel):

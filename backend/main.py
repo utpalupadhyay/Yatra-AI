@@ -57,6 +57,14 @@ if frontend_dir and (frontend_dir / "assets").exists():
 # ── Routes ───────────────────────────────────
 app.include_router(trip_router)
 
+from app.api.routes.trip import generate_trip
+from app.models.trip import TripRequest
+
+@app.post("/api/generate-trip")
+async def api_generate_trip(request: TripRequest):
+    """Direct route for /api/generate-trip endpoint."""
+    return await generate_trip(request)
+
 
 @app.get("/")
 async def root():

@@ -3,6 +3,7 @@ Yatra AI - Gemma 4 Service
 Core AI engine using Gemma 4 via the Gemini API SDK.
 Model: gemma-4-31b-it (Dense) or gemma-4-26b-a4b-it (MoE)
 """
+import os
 import logging
 from typing import Optional
 from google import genai
@@ -10,16 +11,25 @@ from google import genai
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
+
+
+def _get_api_key() -> str:
+    """Retrieve GEMMA_API_KEY from environment or settings."""
+    key = os.environ.get("GEMMA_API_KEY", "").strip()
+    if not key:
+        settings = get_settings()
+        key = (settings.GEMMA_API_KEY or "").strip()
+    return key
 
 
 def _get_client() -> genai.Client:
     """Return an authenticated Gemini API client."""
-    if not settings.GEMMA_API_KEY:
+    key = _get_api_key()
+    if not key or key in ["your_actual_key", "your_new_key_here", "your_gemma_api_key_here"]:
         raise ValueError(
-            "GEMMA_API_KEY is not set. Please add it to your .env file."
+            "AI service is not configured. Please add GEMMA_API_KEY to the server environment."
         )
-    return genai.Client(api_key=settings.GEMMA_API_KEY)
+    return genai.Client(api_key=key)
 
 
 def _build_system_prompt(language: str = "english") -> str:
@@ -58,71 +68,81 @@ def generate_itinerary(
 ) -> dict:
     """
     Generate a full day-by-day travel itinerary using Gemma 4.
-    Returns a dict with itinerary, budget_breakdown, and interaction_id.
+    Returns a dict with itinerary and interaction_id.
     """
     client = _get_client()
-    interests_str = ", ".join(interests) if interests else "No specific interests selected"
+    settings = get_settings()
+
+    interests_str = (
+        ", ".join(interests) if interests and len(interests) > 0
+        else "No specific interests selected"
+    )
     lang_instruction = "Respond in Hindi." if language == "hindi" else "Respond in English."
 
     prompt = f"""
 {lang_instruction}
-Create a complete {num_days}-day travel itinerary for the following trip:
+Create a personalized travel itinerary.
 
-**Trip Details:**
-- 🗺️ From: {origin}
-- 📍 Destination: {destination}
-- 📅 Duration: {num_days} days
-- 💰 Total Budget: ₹{budget:,.0f} for {num_travelers} traveler(s) (₹{budget/num_travelers:,.0f} per person)
-- 👥 Travelers: {num_travelers}
-- 🎯 Travel interests: {interests_str}
-- 🏨 Accommodation: {accommodation.replace('_', ' ').title()}
-- 🍴 Food Preference: {food_preference.replace('_', ' ').title()}
-{f'- 📝 Special Requests: {special_requests}' if special_requests else ''}
+Starting location: {origin}
+Destination: {destination}
+Number of days: {num_days}
+Number of travelers: {num_travelers}
+Total budget: ₹{budget:,.0f}
 
-**Generate:**
+Travel interests:
+{interests_str}
 
-## 🗓️ Day-by-Day Itinerary
+Accommodation:
+{accommodation.replace('_', ' ').title()}
 
-For each day, provide:
-- **Morning** (activity + estimated cost)
-- **Afternoon** (activity + estimated cost)
-- **Evening** (activity + estimated cost)
-- **Dinner** (restaurant recommendation + cost)
-- **Overnight** (accommodation + cost)
+Food preference:
+{food_preference.replace('_', ' ').title()}
 
-## 💰 Budget Breakdown
+Special requests:
+{special_requests or "None"}
 
-Provide a detailed budget breakdown:
-- Transportation (to/from + local): ₹xxx
-- Accommodation ({num_days} nights): ₹xxx
-- Food & Dining: ₹xxx
-- Entry Tickets & Activities: ₹xxx
-- Shopping & Miscellaneous: ₹xxx
-- **Total Estimated: ₹xxx**
-- **Budget Status:** [Under/Over/On Budget]
+Generate a practical day-by-day itinerary.
 
-## ✨ Pro Travel Tips
+Include:
+- Day-by-day schedule (Morning, Afternoon, Evening)
+- Places to visit
+- Suggested activities
+- Food recommendations
+- Accommodation suggestions
+- Approximate daily cost
+- Local transportation suggestions
+- Estimated total cost
+- Useful travel tips
 
-Provide 5 specific tips for this trip (best time to visit, local transport, must-try food, cultural etiquette, safety).
-
-## 🚨 Emergency & Backup Plan
-
-Provide 2-3 backup activities if weather or circumstances change.
-
-Make the plan realistic, specific, and exciting!
+Keep the itinerary within the user's total budget as much as realistically possible.
 """
 
-    interaction = client.interactions.create(
-        model=settings.GEMMA_MODEL,
-        input=prompt,
-        system_instruction=_build_system_prompt(language),
-    )
+    try:
+        interaction = client.interactions.create(
+            model=settings.GEMMA_MODEL,
+            input=prompt,
+            system_instruction=_build_system_prompt(language),
+        )
+    except Exception as e:
+        err_str = str(e).lower()
+        if any(w in err_str for w in ["api_key_invalid", "api key not valid", "invalid api key", "unauthenticated", "401", "403", "permission_denied"]):
+            raise ValueError("The AI API key is invalid or expired.")
+        elif any(w in err_str for w in ["resource_exhausted", "quota", "rate limit", "busy", "429"]):
+            raise ValueError("The AI service is temporarily busy. Please try again.")
+        elif any(w in err_str for w in ["connect", "connecterror", "timeout", "timed out", "dns", "network", "offline"]):
+            raise ValueError("Unable to connect to the AI service. Please try again.")
+        else:
+            logger.error(f"Gemma 4 generation error: {e}")
+            raise ValueError(f"AI generation failed: {str(e)}")
+
+    output_text = getattr(interaction, "output_text", None)
+    if not output_text or not output_text.strip():
+        raise ValueError("The AI returned an unexpected response.")
 
     return {
-        "itinerary": interaction.output_text,
-        "interaction_id": interaction.id,
+        "itinerary": output_text,
+        "interaction_id": getattr(interaction, "id", None),
     }
-
 
 # ──────────────────────────────────────────────
 # CORE FEATURE 2: Smart Re-planner

@@ -12,16 +12,48 @@ const API_BASE = (window.location.protocol === "file:" || window.location.port =
 const api = {
 
   async generateTrip(payload) {
-    const res = await fetch(`${API_BASE}/trip/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || `Server error: ${res.status}`);
+    const endpoint = (window.location.protocol === "file:" || window.location.port === "5500" || window.location.port === "3000")
+      ? "http://localhost:8000/api/generate-trip"
+      : "/api/generate-trip";
+
+    let res;
+    try {
+      res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (networkErr) {
+      throw new Error("Unable to connect to the AI service. Please try again.");
     }
-    return res.json();
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      throw new Error("The AI returned an unexpected response.");
+    }
+
+    if (!res.ok) {
+      const errMsg = data.error || data.detail || (
+        res.status === 401 || res.status === 403
+          ? "The AI API key is invalid or expired."
+          : res.status === 429
+          ? "The AI service is temporarily busy. Please try again."
+          : `Server error (${res.status})`
+      );
+      throw new Error(errMsg);
+    }
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    if (!data.itinerary) {
+      throw new Error("The AI returned an unexpected response.");
+    }
+
+    return data;
   },
 
   async replanTrip(payload) {

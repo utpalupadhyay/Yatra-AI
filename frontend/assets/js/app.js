@@ -6,14 +6,19 @@
 "use strict";
 
 // ── App State ─────────────────────────────────────
+let selectedInterests = [];
+
 const state = {
   currentTrip: null,          // raw itinerary text from Gemma 4
   interactionId: null,        // Gemma 4 interaction ID
   chatConversationId: null,   // for multi-turn chat
   formData: null,             // last submitted form data
+  latestTripRequest: null,    // stored request for retry
   language: "english",
-  selectedInterests: [],      // array of selected interest names
+  selectedInterests: [],      // mirror of selected interests array
 };
+
+let isGenerating = false;
 
 // ── DOM Ready ─────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
@@ -75,30 +80,32 @@ function initNavbar() {
   });
 }
 
-function initInterestChips() {
-  const chips = document.querySelectorAll(".interest-chip");
-  chips.forEach((chip) => {
-    chip.addEventListener("click", (e) => {
-      e.preventDefault(); // Prevent form submission and page reload
-      const interest = chip.getAttribute("data-interest") || chip.textContent.trim();
-      toggleInterest(interest, chip);
-    });
+const toggleInterest = (interest) => {
+  selectedInterests = selectedInterests.includes(interest)
+    ? selectedInterests.filter((item) => item !== interest)
+    : [...selectedInterests, interest];
+  state.selectedInterests = selectedInterests;
+  updateInterestsUI();
+};
+
+function updateInterestsUI() {
+  document.querySelectorAll(".interest-chip").forEach((chip) => {
+    const val = chip.getAttribute("data-interest") || chip.textContent.trim();
+    const isSelected = selectedInterests.includes(val);
+    chip.classList.toggle("selected", isSelected);
+    chip.setAttribute("aria-pressed", isSelected ? "true" : "false");
   });
 }
 
-function toggleInterest(interest, chipEl) {
-  const idx = state.selectedInterests.indexOf(interest);
-  if (idx > -1) {
-    // Already selected -> remove it
-    state.selectedInterests.splice(idx, 1);
-    chipEl.classList.remove("selected");
-    chipEl.setAttribute("aria-pressed", "false");
-  } else {
-    // Not selected -> add it
-    state.selectedInterests.push(interest);
-    chipEl.classList.add("selected");
-    chipEl.setAttribute("aria-pressed", "true");
-  }
+function initInterestChips() {
+  document.querySelectorAll(".interest-chip").forEach((chip) => {
+    chip.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const interest = chip.getAttribute("data-interest") || chip.textContent.trim();
+      toggleInterest(interest);
+    });
+  });
 }
 
 function initBudgetCalculator() {
@@ -144,57 +151,107 @@ function setLanguage(lang) {
 const tripForm = document.getElementById("tripForm");
 
 function getFormData() {
-  // Read interests from state.selectedInterests (or fallback to DOM .selected chips)
-  const interests = state.selectedInterests && state.selectedInterests.length > 0
-    ? [...state.selectedInterests]
-    : [...document.querySelectorAll(".interest-chip.selected")].map(
-        (c) => c.getAttribute("data-interest") || c.textContent.trim()
-      );
-
-  const data = {
-    origin: document.getElementById("origin").value.trim(),
-    destination: document.getElementById("destination").value.trim(),
-    num_days: parseInt(document.getElementById("numDays").value),
-    budget: parseFloat(document.getElementById("budget").value),
-    num_travelers: parseInt(document.getElementById("numTravelers").value),
-    interests,
-    accommodation: document.getElementById("accommodation").value,
-    food_preference: document.getElementById("foodPref").value,
-    special_requests: document.getElementById("specialRequests").value.trim() || null,
-    language: state.language,
-  };
+  const from = document.getElementById("origin").value.trim();
+  const destination = document.getElementById("destination").value.trim();
+  const days = parseInt(document.getElementById("numDays").value);
+  const travelers = parseInt(document.getElementById("numTravelers").value);
+  const budget = parseFloat(document.getElementById("budget").value);
+  const accommodation = document.getElementById("accommodation").value;
+  const foodPreference = document.getElementById("foodPref").value;
+  const specialRequests = document.getElementById("specialRequests").value.trim() || "";
 
   // Validation
-  if (!data.origin) { alert("Please enter your starting city."); return null; }
-  if (!data.destination) { alert("Please enter your destination."); return null; }
-  if (!data.num_days || data.num_days < 1) { alert("Please enter valid number of days."); return null; }
-  if (!data.budget || data.budget < 500) { alert("Budget must be at least ₹500."); return null; }
-  if (!data.num_travelers || data.num_travelers < 1) { alert("Please enter number of travelers."); return null; }
+  if (!from) { alert("Please enter your starting location."); return null; }
+  if (!destination) { alert("Please enter your destination."); return null; }
+  if (!days || days < 1) { alert("Please enter a valid number of days."); return null; }
+  if (!budget || budget < 500) { alert("Budget must be at least ₹500."); return null; }
+  if (!travelers || travelers < 1) { alert("Please enter the number of travelers."); return null; }
 
-  return data;
+  // Clean object as specified in Requirement 2:
+  const tripData = {
+    from,
+    destination,
+    days,
+    travelers,
+    budget,
+    interests: [...selectedInterests],
+    accommodation,
+    foodPreference,
+    specialRequests,
+    // compatibility properties
+    origin: from,
+    num_days: days,
+    num_travelers: travelers,
+    food_preference: foodPreference,
+    special_requests: specialRequests || null,
+    language: state.language || "english",
+  };
+
+  return tripData;
 }
 
-async function handleFormSubmit(e) {
-  e.preventDefault();
-  const data = getFormData();
-  if (!data) return;
+function formatErrorMessage(err) {
+  const raw = (err && err.message) ? err.message : String(err || "");
+  const lower = raw.toLowerCase();
 
-  state.formData = data;
+  if (lower.includes("not configured") || lower.includes("gemma_api_key") || lower.includes("missing api key")) {
+    return "AI service is not configured. Please add GEMMA_API_KEY to the server environment.";
+  }
+  if (lower.includes("invalid") || lower.includes("expired") || lower.includes("401") || lower.includes("403")) {
+    return "The AI API key is invalid or expired.";
+  }
+  if (lower.includes("busy") || lower.includes("rate limit") || lower.includes("quota") || lower.includes("429")) {
+    return "The AI service is temporarily busy. Please try again.";
+  }
+  if (lower.includes("unable to connect") || lower.includes("network") || lower.includes("failed to fetch")) {
+    return "Unable to connect to the AI service. Please try again.";
+  }
+  if (lower.includes("unexpected response") || lower.includes("malformed")) {
+    return "The AI returned an unexpected response.";
+  }
+
+  // Never return just "Something went wrong"
+  if (raw.trim() === "" || raw === "Something went wrong" || raw === "Internal Server Error") {
+    return "Unable to generate trip. Please verify server settings and try again.";
+  }
+
+  return raw;
+}
+
+async function executeGenerateTrip(tripData) {
+  if (isGenerating) return; // Prevent duplicate requests
+  isGenerating = true;
+
+  state.formData = tripData;
+  state.latestTripRequest = tripData;
+
   showLoading();
   startLoadingStepAnimation();
 
   try {
-    const result = await api.generateTrip(data);
-    if (result.success) {
+    const result = await api.generateTrip(tripData);
+    if (result && result.success && result.itinerary) {
       state.currentTrip = result.itinerary;
       state.interactionId = result.interaction_id;
-      showResult(result, data);
+      showResult(result, tripData);
     } else {
-      showError(result.error || "Generation failed. Please try again.");
+      const err = (result && result.error) ? result.error : "The AI returned an unexpected response.";
+      showError(formatErrorMessage(err));
     }
   } catch (err) {
-    showError(err.message || "Could not connect to backend. Is FastAPI running?");
+    showError(formatErrorMessage(err));
+  } finally {
+    isGenerating = false;
+    resetBtn();
   }
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  if (isGenerating) return;
+  const data = getFormData();
+  if (!data) return;
+  await executeGenerateTrip(data);
 }
 
 // ══════════════════════════════════════════════════
@@ -204,8 +261,13 @@ async function handleFormSubmit(e) {
 function showLoading() {
   const btn = document.getElementById("generateBtn");
   btn.disabled = true;
-  btn.querySelector(".btn-text").style.display = "none";
-  btn.querySelector(".btn-loading").style.display = "inline";
+  const btnText = btn.querySelector(".btn-text");
+  const btnLoading = btn.querySelector(".btn-loading");
+  if (btnText) btnText.style.display = "none";
+  if (btnLoading) {
+    btnLoading.style.display = "inline";
+    btnLoading.innerHTML = '<span class="spinner"></span> Generating your AI trip...';
+  }
 
   document.getElementById("outputEmpty").style.display = "none";
   document.getElementById("outputLoading").style.display = "flex";
@@ -242,8 +304,13 @@ function showResult(result, data) {
   wrap.style.justifyContent = "flex-start";
 
   // Trip info header
+  const fromCity = data.from || data.origin || "Origin";
+  const toCity = data.destination || "Destination";
+  const daysNum = data.days || data.num_days || 1;
+  const travNum = data.travelers || data.num_travelers || 1;
+
   document.getElementById("resultTripInfo").textContent =
-    `✈️ ${data.origin} → ${data.destination} | ${data.num_days} days | ₹${Number(data.budget).toLocaleString("en-IN")} | ${data.num_travelers} traveler(s)`;
+    `✈️ ${fromCity} → ${toCity} | ${daysNum} days | ₹${Number(data.budget).toLocaleString("en-IN")} | ${travNum} traveler(s)`;
 
   // Render itinerary markdown
   document.getElementById("itineraryContent").innerHTML = renderMarkdown(result.itinerary || "");
@@ -265,19 +332,11 @@ function showResult(result, data) {
   }, 1500);
 }
 
-function retryGeneration() {
-  if (state.formData) {
-    showLoading();
-    startLoadingStepAnimation();
-    api.generateTrip(state.formData).then((result) => {
-      if (result.success) {
-        state.currentTrip = result.itinerary;
-        state.interactionId = result.interaction_id;
-        showResult(result, state.formData);
-      } else {
-        showError(result.error || "Generation failed.");
-      }
-    }).catch((err) => showError(err.message));
+async function retryGeneration() {
+  if (state.latestTripRequest) {
+    await executeGenerateTrip(state.latestTripRequest);
+  } else if (state.formData) {
+    await executeGenerateTrip(state.formData);
   }
 }
 
