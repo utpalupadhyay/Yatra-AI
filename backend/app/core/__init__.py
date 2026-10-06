@@ -1,0 +1,1 @@
+"""Yatra AI — Core package."""

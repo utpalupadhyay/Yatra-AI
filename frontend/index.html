@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yatra AI — Plan smarter. Travel better.</title>
+  <meta name="description" content="Yatra AI is an adaptive AI travel planner powered by Gemma 4. Get personalized trip itineraries, budget optimization, and smart re-planning."/>
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  NAVBAR                                      -->
+<!-- ═══════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <span class="brand-icon">✈️</span>
+      <span class="brand-name">Yatra <span class="brand-ai">AI</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#planner" class="nav-link">Plan Trip</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <button class="btn-nav-cta" onclick="document.getElementById('planner').scrollIntoView({behavior:'smooth'})">
+        Plan My Trip →
+      </button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  HERO SECTION                                -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-gradient"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Powered by Gemma 4 AI
+    </div>
+    <h1 class="hero-title">
+      Plan smarter.<br/>
+      <span class="gradient-text">Travel better.</span>
+    </h1>
+    <p class="hero-subtitle">
+      Yatra AI is your intelligent travel companion. Tell us your destination, budget, and interests — 
+      <strong>Gemma 4</strong> crafts a personalized itinerary in seconds.
+    </p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="document.getElementById('planner').scrollIntoView({behavior:'smooth'})">
+        ✈️ Start Planning Free
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+        See Features ↓
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">Gemma 4</span><span class="stat-label">AI Engine</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">5+</span><span class="stat-label">AI Features</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">Hindi + English</span><span class="stat-label">Languages</span></div>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  FEATURES SECTION                            -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">What Yatra AI Can Do</span>
+      <h2 class="section-title">Gemma 4 Powers Every Feature</h2>
+      <p class="section-subtitle">Not just a chatbot — a complete travel intelligence system</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🗓️</div>
+        <h3>AI Trip Generator</h3>
+        <p>Gemma 4 analyzes your preferences and creates a detailed day-by-day itinerary with morning, afternoon, and evening plans.</p>
+      </div>
+      <div class="feature-card featured">
+        <div class="feature-badge">Most Popular</div>
+        <div class="feature-icon">💰</div>
+        <h3>Budget Optimizer</h3>
+        <p>Gemma 4 adjusts every aspect of your plan to fit your budget without compromising on experience.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Smart Re-planner</h3>
+        <p>Say "I only have ₹15,000 now" and Gemma 4 instantly re-plans your entire trip to match the new constraint.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Travel Chat Assistant</h3>
+        <p>Ask anything about your trip. Gemma 4 remembers your plan context across the entire conversation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎒</div>
+        <h3>Packing Assistant</h3>
+        <p>Get a personalized packing checklist based on your destination, season, and activity preferences.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Hindi + English</h3>
+        <p>Interact in your preferred language. Gemma 4 understands and responds in both English and Hindi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  HOW IT WORKS                               -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">The Process</span>
+      <h2 class="section-title">How Yatra AI Works</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Enter Your Preferences</h3>
+          <p>Destination, budget, days, interests, accommodation, and food preferences.</p>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Gemma 4 Analyzes</h3>
+          <p>Our Gemma 4 (31B parameter model) reasons through thousands of travel combinations.</p>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Get Your Plan</h3>
+          <p>Receive a complete itinerary, budget breakdown, tips, and packing list.</p>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Refine & Chat</h3>
+          <p>Modify any aspect. Gemma 4 adapts in real-time to your changing needs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  TRIP PLANNER (MAIN APP)                    -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="planner" id="planner">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Trip Planner</span>
+      <h2 class="section-title">Plan Your Perfect Trip</h2>
+      <p class="section-subtitle">Fill in your details — Gemma 4 will handle the rest</p>
+    </div>
+
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+      <button class="lang-btn active" id="btn-en" onclick="setLanguage('english')">🇬🇧 English</button>
+      <button class="lang-btn" id="btn-hi" onclick="setLanguage('hindi')">🇮🇳 हिंदी</button>
+    </div>
+
+    <div class="planner-layout">
+      <!-- ── LEFT: Form ── -->
+      <div class="planner-form-wrap">
+        <form class="planner-form" id="tripForm" novalidate>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="origin">📍 Starting City</label>
+              <input type="text" id="origin" placeholder="e.g., Bhopal" required/>
+            </div>
+            <div class="form-group">
+              <label for="destination">🗺️ Destination</label>
+              <input type="text" id="destination" placeholder="e.g., Jaipur" required/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="numDays">📅 Number of Days</label>
+              <input type="number" id="numDays" placeholder="4" min="1" max="30" required/>
+            </div>
+            <div class="form-group">
+              <label for="numTravelers">👥 Travelers</label>
+              <input type="number" id="numTravelers" placeholder="2" min="1" max="20" required/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">💰 Total Budget (₹)</label>
+            <div class="budget-input-wrap">
+              <span class="currency-symbol">₹</span>
+              <input type="number" id="budget" placeholder="25000" min="500" required/>
+            </div>
+            <div class="budget-per-person" id="budgetPerPerson"></div>
+          </div>
+
+          <div class="form-group">
+            <label>🎯 Travel Interests <small>(select all that apply)</small></label>
+            <div class="interests-grid">
+              <label class="interest-chip"><input type="checkbox" value="history"/> 🏛️ History</label>
+              <label class="interest-chip"><input type="checkbox" value="adventure"/> 🏔️ Adventure</label>
+              <label class="interest-chip"><input type="checkbox" value="food"/> 🍜 Food</label>
+              <label class="interest-chip"><input type="checkbox" value="nature"/> 🌿 Nature</label>
+              <label class="interest-chip"><input type="checkbox" value="shopping"/> 🛍️ Shopping</label>
+              <label class="interest-chip"><input type="checkbox" value="culture"/> 🎭 Culture</label>
+              <label class="interest-chip"><input type="checkbox" value="wildlife"/> 🐯 Wildlife</label>
+              <label class="interest-chip"><input type="checkbox" value="beaches"/> 🏖️ Beaches</label>
+              <label class="interest-chip"><input type="checkbox" value="spirituality"/> 🕌 Spirituality</label>
+              <label class="interest-chip"><input type="checkbox" value="photography"/> 📸 Photography</label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="accommodation">🏨 Accommodation</label>
+              <select id="accommodation">
+                <option value="budget">Budget (₹500-1500/night)</option>
+                <option value="mid_range" selected>Mid-Range (₹1500-4000/night)</option>
+                <option value="luxury">Luxury (₹4000+/night)</option>
+                <option value="hostel">Hostel/Dorm</option>
+                <option value="homestay">Homestay</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="foodPref">🍴 Food Preference</label>
+              <select id="foodPref">
+                <option value="any">Any / Mixed</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="non_vegetarian">Non-Vegetarian</option>
+                <option value="vegan">Vegan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="specialRequests">📝 Special Requests <small>(optional)</small></label>
+            <textarea id="specialRequests" rows="2" placeholder="e.g., travelling with elderly parents, need wheelchair access, anniversary trip..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-generate" id="generateBtn">
+            <span class="btn-text">✨ Generate My Trip with Gemma 4</span>
+            <span class="btn-loading" style="display:none">
+              <span class="spinner"></span> Gemma 4 is planning your trip...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- ── RIGHT: Output ── -->
+      <div class="planner-output-wrap">
+        <!-- Empty State -->
+        <div class="output-empty" id="outputEmpty">
+          <div class="empty-icon">🗺️</div>
+          <h3>Your AI-Powered Trip Plan Will Appear Here</h3>
+          <p>Fill in your travel preferences and click "Generate" to see Gemma 4 in action</p>
+          <div class="example-prompt">
+            <strong>Example:</strong> "4 days in Jaipur from Bhopal with ₹25,000 for 2 people. 
+            Interested in history and food."
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="output-loading" id="outputLoading" style="display:none">
+          <div class="loading-animation">
+            <div class="ai-brain">🧠</div>
+            <div class="loading-dots">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <h3>Gemma 4 is crafting your perfect trip...</h3>
+          <div class="loading-steps" id="loadingSteps">
+            <div class="loading-step active" id="ls1">🔍 Analyzing your preferences...</div>
+            <div class="loading-step" id="ls2">🗺️ Mapping out attractions...</div>
+            <div class="loading-step" id="ls3">💰 Optimizing your budget...</div>
+            <div class="loading-step" id="ls4">✨ Finalizing your itinerary...</div>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="output-error" id="outputError" style="display:none">
+          <div class="error-icon">⚠️</div>
+          <h3>Something went wrong</h3>
+          <p id="errorMessage">Please check your API key and try again.</p>
+          <button class="btn-retry" onclick="retryGeneration()">🔄 Try Again</button>
+        </div>
+
+        <!-- Result State -->
+        <div class="output-result" id="outputResult" style="display:none">
+          <div class="result-header">
+            <div class="result-trip-info" id="resultTripInfo"></div>
+            <div class="result-actions">
+              <button class="btn-action" onclick="copyPlan()" title="Copy Plan">📋 Copy</button>
+              <button class="btn-action" onclick="downloadPlan()" title="Download Plan">⬇️ Download</button>
+              <button class="btn-action" onclick="sharePlan()" title="Share Plan">🔗 Share</button>
+              <button class="btn-replan" onclick="openReplanModal()">🔄 Modify Plan</button>
+            </div>
+          </div>
+          
+          <!-- Tab Navigation -->
+          <div class="result-tabs">
+            <button class="tab-btn active" onclick="switchTab('itinerary')">🗓️ Itinerary</button>
+            <button class="tab-btn" onclick="switchTab('packing')">🎒 Packing List</button>
+            <button class="tab-btn" onclick="switchTab('budget')">💰 Budget Tips</button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div class="tab-content active" id="tab-itinerary">
+            <div class="markdown-output" id="itineraryContent"></div>
+          </div>
+          <div class="tab-content" id="tab-packing">
+            <div class="packing-actions">
+              <button class="btn-sm" onclick="generatePackingList()">🎒 Generate Packing List</button>
+            </div>
+            <div class="markdown-output" id="packingContent">
+              <p class="placeholder-text">Click "Generate Packing List" to get a personalized checklist powered by Gemma 4.</p>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-budget">
+            <div class="budget-actions">
+              <button class="btn-sm" onclick="optimizeBudget()">💡 Optimize My Budget</button>
+            </div>
+            <div class="markdown-output" id="budgetContent">
+              <p class="placeholder-text">Click "Optimize My Budget" to get Gemma 4's smart budget recommendations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  TRAVEL CHAT ASSISTANT                      -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="chat-section" id="chatSection">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Travel Assistant</span>
+      <h2 class="section-title">💬 Chat with Gemma 4</h2>
+      <p class="section-subtitle">Ask anything about your trip — your plan is automatically used as context</p>
+    </div>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message assistant">
+          <div class="message-avatar">🤖</div>
+          <div class="message-bubble">
+            <p>Namaste! I'm your Yatra AI travel assistant powered by Gemma 4. 👋</p>
+            <p>Generate a trip plan first, then ask me anything about it! You can also ask general travel questions about any destination in India.</p>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-suggestions" id="chatSuggestions">
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">🌤️ What's the best time to visit?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">🚌 How to get around cheaply?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">🍜 Best local food to try?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">⚠️ Safety tips for this trip?</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea 
+            class="chat-input" 
+            id="chatInput" 
+            placeholder="Ask anything about your trip or destination..." 
+            rows="1"
+            onkeydown="handleChatKeydown(event)"
+          ></textarea>
+          <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">
+            <span class="send-icon">➤</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  RE-PLAN MODAL                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="replanModal" style="display:none" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>🔄 Modify Your Trip</h2>
+      <button class="modal-close" onclick="closeReplanModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-subtitle">Tell Gemma 4 what you'd like to change about your trip plan.</p>
+      <div class="form-group">
+        <label>What would you like to change?</label>
+        <textarea id="replanRequest" rows="4" placeholder="e.g., 'I now have only ₹15,000. Please reduce costs.' or 'Replace Day 2 with a nature/hiking day.' or 'Add a spa day on Day 3.'"></textarea>
+      </div>
+      <div class="form-group">
+        <label>New Budget (₹) <small>optional — leave blank to keep current</small></label>
+        <input type="number" id="replanBudget" placeholder="Leave blank to keep current budget" min="500"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeReplanModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitReplan()">
+        <span id="replanBtnText">🔄 Re-plan with Gemma 4</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  FOOTER                                     -->
+<!-- ═══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-brand">
+      <span>✈️ Yatra AI</span>
+      <span class="footer-tagline">Plan smarter. Travel better.</span>
+    </div>
+    <div class="footer-powered">
+      <span>Core AI: </span>
+      <strong>Gemma 4 (gemma-4-31b-it)</strong>
+      <span> by Google DeepMind</span>
+    </div>
+    <div class="footer-links">
+      <a href="/docs" target="_blank">API Docs</a>
+      <span>·</span>
+      <a href="https://aistudio.google.com" target="_blank">Get API Key</a>
+    </div>
+    <p class="footer-note">Built for Hackofest Hackathon 2026 · Powered by Gemma 4 AI</p>
+  </div>
+</footer>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/markdown.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

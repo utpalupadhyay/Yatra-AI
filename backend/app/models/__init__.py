@@ -1,0 +1,1 @@
+"""Yatra AI - Models package."""
