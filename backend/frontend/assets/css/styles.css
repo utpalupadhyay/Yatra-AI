@@ -126,11 +126,20 @@ body {
   padding: 100px var(--sp-lg) 60px;
 }
 .hero-bg { position: absolute; inset: 0; }
+.hero-image {
+  position: absolute; inset: 0;
+  background-image: url('../images/hero-bg.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  filter: saturate(1.1) brightness(0.65);
+  transform: scale(1.02);
+}
 .hero-gradient {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,107,53,0.12) 0%, transparent 70%),
-              radial-gradient(ellipse 50% 40% at 80% 70%, rgba(168,85,247,0.1) 0%, transparent 60%),
-              linear-gradient(180deg, #0D0D1A 0%, #1A1A2E 100%);
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,107,53,0.18) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 50% at 80% 70%, rgba(168,85,247,0.2) 0%, transparent 60%),
+              linear-gradient(180deg, rgba(13,13,26,0.72) 0%, rgba(26,26,46,0.85) 75%, #0D0D1A 100%);
 }
 .hero-particles { position: absolute; inset: 0; overflow: hidden; }
 .particle {
